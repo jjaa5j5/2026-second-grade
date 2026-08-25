@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Vault - 스마트 사진 정리기</title>
+    <!-- Tailwind CSS & Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 h-screen flex overflow-hidden font-sans">
+
+    <!-- 좌측 사이드바 -->
+    <aside class="w-80 bg-slate-950/80 backdrop-blur-md border-r border-slate-800/80 flex flex-col justify-between z-10">
+        <div>
+            <!-- 서비스 로고/헤더 -->
+            <div class="p-6 border-b border-slate-800/80 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2.5 bg-indigo-600/20 text-indigo-400 rounded-xl border border-indigo-500/30">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-base text-white tracking-tight">Photo Vault</h1>
+                        <p class="text-[11px] text-slate-400 font-medium">EXIF Auto Organizer</p>
+                    </div>
+                </div>
+                <button onclick="location.reload()" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800/60 rounded-lg transition-colors" title="페이지 새로고침">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 이전 정리 목록 -->
+            <div class="p-4">
+                <div class="flex items-center justify-between px-2 mb-3">
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">정리된 보관함</span>
+                    <span id="total-folders-count" class="text-[11px] text-indigo-400 font-semibold bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">0개 폴더</span>
+                </div>
+                <div id="folder-list" class="space-y-1.5 overflow-y-auto max-h-[calc(100vh-220px)] pr-1">
+                    <!-- Dynamic Folders -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 정보 -->
+        <div class="p-4 border-t border-slate-800/80 bg-slate-950/40 text-center">
+            <span class="inline-flex items-center gap-1.5 text-xs text-slate-400">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Engine Ready
+            </span>
+        </div>
+    </aside>
+
+    <!-- 우측 메인 영역 -->
+    <main class="flex-1 flex flex-col overflow-y-auto bg-slate-900">
+        
+        <div class="p-8 max-w-7xl w-full mx-auto space-y-8">
+            
+            <!-- 상단 서비스 안내 & 카드 설명 -->
+            <section class="bg-gradient-to-r from-indigo-900/40 via-slate-800/60 to-slate-800/40 border border-indigo-500/20 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+                <div class="flex items-start space-x-4">
+                    <div class="p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-xl text-indigo-400 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white tracking-tight">스마트 EXIF 사진 분류 보관함</h2>
+                        <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                            업로드한 사진의 <span class="text-indigo-400 font-semibold">EXIF 메타데이터(촬영 날짜)</span>를 자동으로 분석하여 
+                            <span class="text-indigo-300 font-medium">[연-월] ➔ [연-월-일]</span> 폴더 구조로 깔끔하게 정리해 드립니다.
+                        </p>
+                        <div class="flex flex-wrap items-center gap-4 mt-3 text-[11px] text-slate-400">
+                            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span> 카톡/다운로드 사진은 unknown_Date로 분류</span>
+                            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span> 좌측 목록에서 날짜별 갤러리 즉시 조회</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 드롭존 (업로드 카드) -->
+            <section class="relative">
+                <div id="drop-zone" class="group border-2 border-dashed border-slate-700/80 hover:border-indigo-500/80 bg-slate-800/30 hover:bg-slate-800/60 rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 shadow-xl backdrop-blur-sm">
+                    <div class="w-14 h-14 bg-indigo-600/10 border border-indigo-500/20 group-hover:scale-110 group-hover:bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-all duration-300">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 0115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-base font-semibold text-white group-hover:text-indigo-300 transition-colors">새 사진들을 여기에 드래그하여 업로드하세요</h3>
+                    <p class="text-xs text-slate-400 mt-1">카메라 원본 파일 및 .jpg, .jpeg, .png 확장자를 지원합니다.</p>
+                    <input type="file" id="file-input" multiple accept="image/*" class="hidden">
+                </div>
+
+                <!-- 진행 상태 표시 바 -->
+                <div id="upload-status" class="hidden absolute inset-0 bg-slate-900/90 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center border border-indigo-500/30">
+                    <div class="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                    <p class="text-sm font-semibold text-white">EXIF 메타데이터를 분석 및 정리하고 있습니다...</p>
+                </div>
+            </section>
+
+            <!-- 갤러리 섹션 -->
+            <section class="bg-slate-800/40 rounded-2xl p-6 border border-slate-800 shadow-xl">
+                <div class="flex items-center justify-between border-b border-slate-700/60 pb-5 mb-6">
+                    <div>
+                        <h2 id="current-folder-title" class="text-lg font-bold text-white tracking-tight">폴더를 선택해주세요</h2>
+                        <p id="current-folder-sub" class="text-xs text-slate-400 mt-0.5">좌측 메뉴에서 사진을 열람할 보관함을 클릭하세요.</p>
+                    </div>
+                    <span id="photo-count-badge" class="hidden px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full text-xs font-medium border border-slate-600/50">0개 항목</span>
+                </div>
+
+                <!-- Photo Grid -->
+                <div id="photo-gallery" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    <div class="col-span-full py-16 text-center">
+                        <div class="w-12 h-12 bg-slate-800 text-slate-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <p class="text-sm text-slate-400">보관함을 선택하면 해당 날짜의 사진들이 그리드로 표시됩니다.</p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const uploadStatus = document.getElementById('upload-status');
+
+        async function loadFolders() {
+            const res = await fetch('/api/folders');
+            const folders = await res.json();
+            const list = document.getElementById('folder-list');
+            document.getElementById('total-folders-count').textContent = `${folders.length}개 폴더`;
+            
+            list.innerHTML = '';
+            
+            if(folders.length === 0) {
+                list.innerHTML = '<p class="text-xs text-slate-500 text-center py-6">정리된 사진이 없습니다.</p>';
+                return;
+            }
+
+            folders.forEach(f => {
+                list.innerHTML += `
+                    <button onclick="loadGallery('${f.name}')" 
+                            class="w-full text-left p-3 rounded-xl hover:bg-slate-800/80 border border-transparent hover:border-slate-700/60 flex items-center justify-between group transition-all duration-200">
+                        <div class="flex items-center space-x-2.5 min-w-0">
+                            <span class="text-base group-hover:scale-110 transition-transform">📂</span>
+                            <span class="text-xs font-medium text-slate-300 group-hover:text-white truncate">${f.name}</span>
+                        </div>
+                        <span class="text-[11px] font-semibold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md border border-indigo-500/20 group-hover:bg-indigo-500/20">${f.count}장</span>
+                    </button>
+                `;
+            });
+        }
+
+        // [수정] 하위 일자 경로 사진 조회 대응 함수
+        async function loadGallery(folderName) {
+            document.getElementById('current-folder-title').textContent = `📂 ${folderName}`;
+            document.getElementById('current-folder-sub').textContent = `${folderName} 보관함에 저장된 사진 모음입니다.`;
+            
+            const res = await fetch(`/api/photos/${folderName}`);
+            const photoPaths = await res.json();
+            const gallery = document.getElementById('photo-gallery');
+            const badge = document.getElementById('photo-count-badge');
+            
+            badge.classList.remove('hidden');
+            badge.textContent = `${photoPaths.length}개 항목`;
+            gallery.innerHTML = '';
+            
+            if(photoPaths.length === 0) {
+                gallery.innerHTML = '<p class="text-slate-400 text-xs col-span-full text-center py-12">이 폴더에 저장된 파일이 없습니다.</p>';
+                return;
+            }
+
+            photoPaths.forEach(path => {
+                const imgUrl = `/photos/${path}`;
+                const filename = path.split('/').pop(); // 파일명만 추출해서 캡션으로 사용
+                
+                gallery.innerHTML += `
+                    <div class="group relative aspect-square bg-slate-950 rounded-xl overflow-hidden border border-slate-800 hover:border-indigo-500/50 shadow-lg hover:shadow-indigo-500/10 transition-all duration-300">
+                        <img src="${imgUrl}" alt="${filename}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-2.5">
+                            <p class="text-[11px] font-medium text-slate-200 truncate w-full text-center">${filename}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Dropzone Event Listeners
+        dropZone.addEventListener('click', () => fileInput.click());
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => dropZone.addEventListener(evt, e => e.preventDefault()));
+        dropZone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+        fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+        async function handleFiles(files) {
+            if (files.length === 0) return;
+
+            const formData = new FormData();
+            for (let file of files) formData.append('photos', file);
+
+            uploadStatus.classList.remove('hidden');
+
+            try {
+                const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                const result = await res.json();
+                await loadFolders();
+            } catch (err) {
+                alert("업로드 중 오류가 발생했습니다.");
+            } finally {
+                uploadStatus.classList.add('hidden');
+            }
+        }
+
+        loadFolders();
+    </script>
+</body>
+</html>
