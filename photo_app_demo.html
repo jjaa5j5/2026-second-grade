@@ -54,7 +54,7 @@
                         <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 0115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                     </div>
                     <h3 class="text-base font-semibold text-white group-hover:text-indigo-300 transition-colors">사진을 여기에 드래그하여 업로드하세요</h3>
-                    <p class="text-xs text-slate-400 mt-1">웹 브라우저에서 메타데이터를 직접 분석하여 날짜별로 정돈합니다.</p>
+                    <p class="text-xs text-slate-400 mt-1">웹 브라우저에서 메타데이터를 직접 분석하여 연-월-일로 정돈합니다.</p>
                     <input type="file" id="file-input" multiple accept="image/*" class="hidden">
                 </div>
             </section>
@@ -92,7 +92,8 @@
                     
                     if (dateTime) {
                         const parts = dateTime.split(" ")[0].split(":");
-                        if (parts.length === 3) dateKey = `${parts[0]}-${parts[1]}`;
+                        // 연도-월-일 (YYYY-MM-DD) 형태로 조합
+                        if (parts.length === 3) dateKey = `${parts[0]}-${parts[1]}-${parts[2]}`;
                     }
 
                     if (!photosByDate[dateKey]) photosByDate[dateKey] = [];
@@ -110,7 +111,7 @@
 
         function updateSidebar() {
             const list = document.getElementById('folder-list');
-            const keys = Object.keys(photosByDate);
+            const keys = Object.keys(photosByDate).sort().reverse(); // 날짜순 정렬
             document.getElementById('total-folders-count').textContent = `${keys.length}개 폴더`;
             list.innerHTML = '';
 
