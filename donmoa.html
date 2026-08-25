@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>돈모아 - 대학생 가계부</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<!-- 헤더 (수평 정렬) -->
+<header>
+  <div class="logo">💰 돈모아</div>
+  <div class="header-right">대학생 가계부</div>
+</header>
+
+<!-- One True 레이아웃: 사이드바 + 메인 -->
+<div class="page-wrapper">
+
+  <!-- 사이드바 -->
+  <nav class="sidebar">
+    <ul>
+      <li class="active" onclick="showSection('home', this)">🏠 홈</li>
+      <li onclick="showSection('add', this)">📝 내역 추가</li>
+      <li onclick="showSection('list', this)">
+        <div class="badge-wrap">
+          📋 거래 내역
+          <!-- 절대 좌표 배지 -->
+          <span class="badge" id="txBadge">0</span>
+        </div>
+      </li>
+      <li onclick="showSection('music', this)">🎵 집중 음악</li>
+    </ul>
+  </nav>
+
+  <!-- 메인 콘텐츠 (중앙 정렬) -->
+  <div class="main-content">
+    <div class="center-box">
+
+      <!-- 홈 섹션 -->
+      <div id="section-home">
+        <div class="summary">
+          <div class="card">
+            <div class="label">💚 수입</div>
+            <div class="amount income" id="totalIncome">0원</div>
+          </div>
+          <div class="card">
+            <div class="label">🔴 지출</div>
+            <div class="amount expense" id="totalExpense">0원</div>
+          </div>
+          <div class="card">
+            <div class="label">💙 잔액</div>
+            <div class="amount balance" id="totalBalance">0원</div>
+          </div>
+        </div>
+
+        <div class="list-box">
+          <h3>📋 최근 내역</h3>
+          <div id="recentList">
+            <div class="empty">아직 내역이 없습니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 내역 추가 섹션 -->
+      <div id="section-add" style="display:none;">
+        <div class="form-box">
+          <h3>📝 내역 추가</h3>
+          <div class="form-row">
+            <select id="typeSelect">
+              <option value="income">💚 수입</option>
+              <option value="expense">🔴 지출</option>
+            </select>
+            <select id="categorySelect">
+              <option value="식비">🍜 식비</option>
+              <option value="교통">🚌 교통</option>
+              <option value="카페">☕ 카페</option>
+              <option value="쇼핑">🛍️ 쇼핑</option>
+              <option value="학업">📚 학업</option>
+              <option value="여가">🎮 여가</option>
+              <option value="알바">💵 알바</option>
+              <option value="용돈">🎁 용돈</option>
+              <option value="기타">📦 기타</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <input type="text" id="descInput" placeholder="내용 (예: 편의점 점심)">
+            <input type="number" id="amountInput" placeholder="금액 (원)">
+          </div>
+          <div class="form-row">
+            <input type="date" id="dateInput">
+          </div>
+          <button class="add-btn" onclick="addTransaction()">추가하기</button>
+        </div>
+      </div>
+
+      <!-- 전체 내역 섹션 -->
+      <div id="section-list" style="display:none;">
+        <div class="list-box">
+          <h3>📋 전체 거래 내역</h3>
+          <div id="txList">
+            <div class="empty">아직 내역이 없습니다.<br>내역 추가 탭에서 추가해보세요!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 음악 섹션 (오디오 활용) -->
+      <div id="section-music" style="display:none;">
+        <div class="music-box">
+          <h3>🎵 집중 음악</h3>
+          <p>가계부 정리할 때 집중력을 높여주는 음악을 재생해보세요.</p>
+          <div class="music-buttons">
+            <button class="music-btn" onclick="playMusic('lofi')">🎧 Lo-fi 음악</button>
+            <button class="music-btn" onclick="playMusic('nature')">🌿 자연 소리</button>
+            <button class="music-btn" onclick="playMusic('rain')">🌧️ 빗소리</button>
+            <button class="music-btn" onclick="stopMusic()">⏹ 정지</button>
+          </div>
+          <audio id="audioPlayer" controls loop style="width:100%; margin-top:8px;" >
+            브라우저가 오디오를 지원하지 않습니다.
+          </audio>
+          <p style="margin-top:8px; font-size:12px; color:#bbb;">※ 음악 파일(lofi.mp3, nature.mp3, rain.mp3)을 같은 폴더에 넣으면 재생됩니다.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  © 2025 돈모아 - 경기대학교 AI컴퓨터학부 컴퓨터공학전공
+</footer>
+
+<script src="./script.js"></script>
+</body>
+</html>
